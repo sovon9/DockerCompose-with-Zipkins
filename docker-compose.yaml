@@ -1,0 +1,58 @@
+version: '3.7'
+
+services:
+ Currency-Exchange:
+   image: sovon9/currency-exchange:0.0.1-SNAPSHOT
+   ports: 
+     - 8080:8080
+   depends_on:
+     - Naming-Server
+   networks:
+     - currency-network
+   environment:
+     - SPRING_PROFILES_ACTIVE=docker
+     
+ Naming-Server:
+   image: sovon9/naming-server:0.0.1-SNAPSHOT
+   container_name: naming-server
+   ports: 
+     - 8761:8761
+   networks:
+     - currency-network
+   environment:
+     - SPRING_PROFILES_ACTIVE=docker
+     
+ Currency-Conversion:
+   image: sovon9/currency-conversion:0.0.1-SNAPSHOT
+   container_name: currency-conversion
+   ports: 
+     - 8082:8082
+   depends_on:
+     - Naming-Server    
+   networks:
+     - currency-network
+   environment:
+     - SPRING_PROFILES_ACTIVE=docker
+     
+ API-GATEWAY:
+   image: sovon9/api-gateway:0.0.1-SNAPSHOT
+   container_name: api-gateway
+   ports: 
+     - 8282:8282
+   depends_on:
+     - Naming-Server    
+   networks:
+     - currency-network
+   environment:
+     - SPRING_PROFILES_ACTIVE=docker
+     
+ zipkin:
+   image: openzipkin/zipkin
+   container_name: zipkin
+   ports: 
+     - 9411:9411    
+   networks:
+     - currency-network
+     
+networks:
+  currency-network:
